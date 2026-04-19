@@ -6,3 +6,5 @@ networkx
 nltk
 pydantic
 python-multipart
+hdbscan
+sentence-transformers

@@ -1,21 +1,24 @@
 import numpy as np
 import networkx as nx
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
-
+from app.embeddings import model
 def textrank(sentences, top_k=5):
     if len(sentences) <= top_k:
         return sentences
 
-    vectorizer = TfidfVectorizer().fit_transform(sentences)
-    vectors = vectorizer.toarray()
+    texts = [s["text"] for s in sentences]
 
-    sim_matrix = cosine_similarity(vectors)
+    embeddings = model.encode(texts)
+
+    sim_matrix = cosine_similarity(embeddings)
 
     graph = nx.from_numpy_array(sim_matrix)
 
     scores = nx.pagerank(graph)
 
-    ranked = sorted(((scores[i], s) for i, s in enumerate(sentences)), reverse=True)
+    ranked = sorted(
+        ((scores[i], sentences[i]) for i in range(len(sentences))),
+        reverse=True
+    )
 
     return [s for _, s in ranked[:top_k]]
